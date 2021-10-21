@@ -1,0 +1,22 @@
+{
+  "name": "ar-nazotoki",
+  "version": "0.1.0",
+  "description": "AR謎解き",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo --live --verbose --port 8080 --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SomaKamikubo/AR-nazotoki.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SomaKamikubo/AR-nazotoki/issues"
+  },
+  "homepage": "https://github.com/SomaKamikubo/AR-nazotoki#readme",
+  "devDependencies": {
+    "budo": "^11.6.4"
+  }
+}
