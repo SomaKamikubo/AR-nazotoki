@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ARN_Question1</title>
+    <meta name="description" content="Hello,WebVR! - A-Frame">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  </head>
+  <body>
+    <a-scene embedded arjs>
+      <a-marker type='pattern' url='./MarkerPage/ARpatt/pattern-kohan.patt'>
+        <a-box position="0 0 0" depth="1" height="0.01" width="1" src="https://cdn.glitch.me/36c19221-379c-43ba-ab8b-4e79d34b8890%2Fhint.png?v=1636388750183"></a-box>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
