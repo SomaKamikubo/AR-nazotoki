@@ -4,7 +4,7 @@
   "description": "AR謎解き",
   "main": "index.js",
   "scripts": {
-    "start": "budo --live --verbose --port 8080 --open"
+    "start": "budo --live --verbose --port 8000 --open"
   },
   "repository": {
     "type": "git",
