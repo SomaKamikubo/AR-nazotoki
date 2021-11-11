@@ -2,6 +2,12 @@
 **チーム：上久保の民**
 
 AR謎解きです。
+
+**現時点でのデモ**  
+1. [このページ](https://somakamikubo.github.io/AR-nazotoki/nazo01-sheet.html)をPCで開く。
+2. https://somakamikubo.github.io/AR-nazotoki/ (下のQRコードからアクセス可能) をスマホで開いて、カメラ使用を許可する。
+  ![qr-code](https://cdn.glitch.me/4a8b529c-fb0a-4e39-9fe3-b31fd5188051%2Fqrcode_somakamikubo.github.io.png?v=1636639081606)
+3. PCで開いたワークシートをカメラで映すとワークシートにヒントが現れます！
 ___
 
 ## エレベーターピッチ
