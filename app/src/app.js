@@ -1,4 +1,6 @@
-import ARN from './ARNEngine/arn-engine.js';
+import ARNEngine from './ARNEngine/arn-engine.js';
+import nazo01 from './NazoPlugins/nazo01';
 
 console.log('test !!');
-ARN.update();
+const arn = new ARNEngine('scene-main');
+arn.registerNazoPlugin('nazo01', nazo01);
