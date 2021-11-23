@@ -2,9 +2,10 @@
   "name": "ar-nazotoki",
   "version": "0.1.0",
   "description": "AR謎解き",
-  "main": "index.js",
   "scripts": {
-    "start": "budo --live --verbose --port 8000 --open"
+    "start": "webpack serve --port 8000",
+    "build": "webpack",
+    "prod": "webpack --mode=production"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,10 @@
   },
   "homepage": "https://github.com/SomaKamikubo/AR-nazotoki#readme",
   "devDependencies": {
-    "budo": "^11.6.4"
+    "budo": "^11.6.4",
+    "copy-webpack-plugin": "^10.0.0",
+    "webpack": "^5.64.2",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.5.0"
   }
 }
