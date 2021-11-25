@@ -1,7 +1,60 @@
 
 class ARNEntity {
-  constructor() {}
+  constructor(entityId) {
+    this.id = entityId;
+    this.el = document.getElementById(entityId);
+  }
 
+  get visible(){
+    return this.el.object3D.visible;
+  }
+  set visible(v){
+    this.el.object3D.visible = v;
+  }
+
+  get position(){
+    const v = this.el.object3D.position;
+    return [v.x, v.y, v.z];
+  }
+  set position(newPos){
+    this.el.object3D.position.set(...newPos);
+  }
+
+  get rotation(){
+    const e = this.el.object3D.rotation;
+    return [e.x, e.y, e.z];
+  }
+  set rotation(newRotation){
+    this.el.object3D.rotation.setFromVector3(...newRotation);
+  }
+
+  get scale(){
+    const s = this.el.object3D.scale;
+    return [s.x, s.y, s.z];
+  }
+  set scale(newScale){
+    this.el.object3D.scale.set(...newScale);
+  }
+
+  get parent(){
+    return this.el.parentElement.getAttribute('id');
+  }
+  set parent(entityId){
+    const parentEl = document.getElementById(entityId);
+    parentEl.appendChild(this.el);
+  }
+
+  get children(){
+    return this.el.children.map(e => e.getAttribute('id'));
+  }
+
+  addTouchedEventListener(listener){
+    this.el.classList.add('touchable');
+    this.el.addEventListener('click', listener);
+  }
+  destroy(){
+    this.el.destroy();
+  }
 }
 
 const Utils = {
@@ -18,6 +71,12 @@ class ARNEngine {
       return;
     }
     this.plugins = [];
+  }
+
+  _setupTouchEvent(){
+    document.addEventListener('touchend', (e) => {
+      // 
+    }, false);
   }
 
   registerNazoPlugin(name, plugin){
@@ -74,7 +133,7 @@ class ARNEngine {
     };
   }
 
-  createEntity(assetId, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
+  createEntity(id, assetId, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
     const assetEl = document.getElementById(assetId);
     if (!assetEl){
       console.error('指定されたassetIdのアセットは存在しません！');
@@ -93,6 +152,7 @@ class ARNEngine {
         console.error('不正なassetType');
         return;
     }
+    newEntityEl.setAttribute('id', id);
     newEntityEl.setAttribute('src', `#${assetId}`);
     newEntityEl.setAttribute('position', `${Utils.vec3ToStr(position)}`);
     newEntityEl.setAttribute('rotation', `${Utils.vec3ToStr(rotation)}`);
@@ -103,13 +163,11 @@ class ARNEngine {
     }else{
       this.sceneEl.appendChild(newEntityEl);
     }
+    return new ARNEntity(id);
   }
 
   getEntity(entityId){
-    console.error('未実装です！');
-    return {
-
-    };
+    return new ARNEntity(entityId);
   }
 
   getEntities(assetId){
