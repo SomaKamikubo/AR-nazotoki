@@ -15,6 +15,10 @@ class Nazo02 {
         }
       });
     });
+    const {camera,object,raycas,touchpos,text} = engine._setupTouchEvent();
+    // chestEntity.addTouchedEventListener(() => {
+    //   alert('タッチされました！');
+    // });
     engine.createEntity('nazo01-2-img-entity', 'nazo01-2-img', 'nazo01-chest-entity', [0, 3, 0]);
   }
 }
