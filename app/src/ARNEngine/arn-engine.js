@@ -216,7 +216,8 @@ class ARNEngine {
   getInputText(message){
     return new Promise((resolve, reject) => {
       // messageを表示してユーザに入力を促す。
-      resolve('ユーザが入力した文字列');
+      let answer = prompt(message);
+      resolve(answer);
     });
   }
 }
