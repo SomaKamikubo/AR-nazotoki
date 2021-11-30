@@ -176,8 +176,10 @@ class ARNEngine {
   }
 
   getInputText(message){
-    console.error('未実装です！');
-    return new Promise();
+    return new Promise((resolve, reject) => {
+      // messageを表示してユーザに入力を促す。
+      resolve('ユーザが入力した文字列');
+    });
   }
 }
 
