@@ -48,7 +48,11 @@ class ARNEntity {
     return this.el.children.map(e => e.getAttribute('id'));
   }
 
-  addTouchedEventListener(listener){
+  get object3d(){
+    return this.el.object3D;
+  }
+
+  addTouchedEventListener(touchsetup,listener){
     this.el.classList.add('touchable');
     this.el.addEventListener('click', listener);
   }
@@ -74,9 +78,43 @@ class ARNEngine {
   }
 
   _setupTouchEvent(){
-    document.addEventListener('touchend', (e) => {
-      // 
+    //カメラの定義
+    const camera = new THREE.PerspectiveCamera();
+    //3dオブジェクトの定義
+    const object = new THREE.Mesh();
+
+    //レイキャストを作成,タッチするときのタッチした座標
+    var raycaster = new THREE.Raycaster(); 
+    var touch = new THREE.Vector2();
+    //おそらくセットアップはここまで
+
+    document.addEventListener('click', function(e){
+      e.preventDefault();
+      //取得した座標を-1~1の範囲に正規化する
+      touch.x = (e.clientX/window.innerWidth) * 2 - 1;
+      touch.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+      
+      raycaster.setFromCamera(touch, camera);
+
+      //
+      //raycaster.intersectObjects(object3D)
+      var intersects = raycaster.intersectObjects(object,true);
+      
+      if ( intersects.length != 0 ) {
+        alert('おめでとう,モデルをタッチしたよ');
+      }
+      else{
+        alert('画面はタッチしたよ ');
+      }
+
     }, false);
+    return{
+      camera:camera,
+      object:object,
+      raycas:raycaster,
+      touchpos:touch,
+      text:'リターンできてるよ'
+    };
   }
 
   registerNazoPlugin(name, plugin){
