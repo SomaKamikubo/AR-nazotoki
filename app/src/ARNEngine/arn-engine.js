@@ -49,8 +49,25 @@ class ARNEntity {
   }
 
   addTouchedEventListener(listener){
-    this.el.classList.add('touchable');
-    this.el.addEventListener('click', listener);
+    //3dオブジェクトの定義
+    const object = this.el.object3D;
+    document.addEventListener('click',function(e){
+      e.preventDefault();
+      //取得した座標を-1~1の範囲に正規化する
+      const touchpos = new THREE.Vector2();
+      touchpos.x = (e.clientX/window.innerWidth) * 2 - 1;
+      touchpos.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+      //レイキャストを作成,タッチするときのタッチした座標
+      const raycaster = new THREE.Raycaster();
+      //カメラの定義
+      const camera = new THREE.PerspectiveCamera();
+      raycaster.setFromCamera(touchpos, camera);
+      const intersects = raycaster.intersectObject(object,true);
+      if ( intersects.length > 0 ) {
+        listener();
+      }
+    }, false);
   }
   destroy(){
     this.el.destroy();
@@ -71,12 +88,6 @@ class ARNEngine {
       return;
     }
     this.plugins = [];
-  }
-
-  _setupTouchEvent(){
-    document.addEventListener('touchend', (e) => {
-      // 
-    }, false);
   }
 
   registerNazoPlugin(name, plugin){
@@ -178,7 +189,8 @@ class ARNEngine {
   getInputText(message){
     return new Promise((resolve, reject) => {
       // messageを表示してユーザに入力を促す。
-      resolve('ユーザが入力した文字列');
+      let answer = prompt(message);
+      resolve(answer);
     });
   }
 }
