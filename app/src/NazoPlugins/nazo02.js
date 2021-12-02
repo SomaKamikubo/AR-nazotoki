@@ -9,7 +9,12 @@ class Nazo02 {
     const chestEntity = engine.createEntity('nazo01-chest-entity', 'nazo01-chest-model', 'nazo01-map-marker', [-2,0,2], [0,180,0]);
     
     chestEntity.addTouchedEventListener(() => {
-       alert('タッチされました！');
+      alert('タッチされました！');
+      engine.getInputText('答えを入力してください').then(inputText => {
+        if (inputText === 'こたえ'){
+          alert('正解です！');
+        }
+      });
     });
     engine.createEntity('nazo01-2-img-entity', 'nazo01-2-img', 'nazo01-chest-entity', [0, 3, 0]);
   }
