@@ -61,7 +61,6 @@ class ARNEntity {
       //レイキャストを作成,タッチするときのタッチした座標
       const raycaster = new THREE.Raycaster();
       //カメラの定義
-      //const camera = new THREE.PerspectiveCamera();
       const camera = document.getElementById('camera').getObject3D('camera');
       raycaster.setFromCamera(touchpos, camera);
       const intersects = raycaster.intersectObject(object,true);
