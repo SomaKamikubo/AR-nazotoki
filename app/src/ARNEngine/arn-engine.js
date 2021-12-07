@@ -72,6 +72,12 @@ class ARNEntity {
   destroy(){
     this.el.destroy();
   }
+
+  addVisibleChangedEventListener(listener){
+    if(this.visible === True){
+      listener();
+    }
+  }
 }
 
 const Utils = {
@@ -128,6 +134,8 @@ class ARNEngine {
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
     this.sceneEl.appendChild(markerEl);
+
+    return new ARNEntity(id);
   }
 
   addEventListener(type, listener){
