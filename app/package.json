@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "AR謎解き",
   "scripts": {
-    "start": "webpack serve --port 8000",
+    "start": "webpack serve --port 80",
     "build": "webpack",
     "prod": "webpack --mode=production"
   },
