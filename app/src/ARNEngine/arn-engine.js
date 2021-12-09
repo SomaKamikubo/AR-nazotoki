@@ -73,11 +73,7 @@ class ARNEntity {
     this.el.destroy();
   }
 
-  addVisibleChangedEventListener(listener){
-    if(this.visible === True){
-      listener();
-    }
-  }
+  
 }
 
 const Utils = {
@@ -85,6 +81,16 @@ const Utils = {
     return vec3.reduce((pre, curr) => pre + ' ' + curr, '');
   }
 };
+
+class ARNMarkerEntity extends ARNEntity{
+  addMarkerFoundEventListener(listener){
+    this.el.addEventListener('markerFound', listener);
+  }
+  addMarkerLostEventListener(listener){
+    this.el.addEventListener('markerLost', listener);
+  }
+
+}
 
 class ARNEngine {
   constructor(sceneId) {
@@ -135,7 +141,7 @@ class ARNEngine {
     markerEl.setAttribute('url', pattUrl);
     this.sceneEl.appendChild(markerEl);
 
-    return new ARNEntity(id);
+    return new ARNMarkerEntity(id);
   }
 
   addEventListener(type, listener){
