@@ -150,12 +150,13 @@ class ARNEngine {
 
   getMarker(markerId){
     console.error('未実装です！');
-    return {
-      id: 'id-string',
-      awared: false,
-      position: [0,0,0],
-      rotation: [0,0,0]
-    };
+    return new ARNMarkerEntity(markerId);
+    // return {
+    //   id: 'id-string',
+    //   awared: false,
+    //   position: [0,0,0],
+    //   rotation: [0,0,0]
+    // };
   }
 
   createEntity(id, assetId, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
