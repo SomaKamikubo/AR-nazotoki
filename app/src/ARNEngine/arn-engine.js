@@ -1,3 +1,4 @@
+import { io } from 'socket.io-client';
 
 class ARNEntity {
   constructor(entityId) {
@@ -88,6 +89,23 @@ class ARNEngine {
       return;
     }
     this.plugins = [];
+    this._connectIO();
+    this.socket.emit('echo', 'hello from client!');
+  }
+
+  _connectIO(){
+    const socket = io({
+      path: `${location.pathname}socket.io/`,
+    });
+
+    socket.on('connect', () => {
+      console.log('接続完了!');
+    });
+    socket.on('echo', text => {
+      console.log(text);
+    });
+
+    this.socket = socket;
   }
 
   registerNazoPlugin(name, plugin){

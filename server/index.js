@@ -18,6 +18,6 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use('/', express.static('public'));
+app.use('/', express.static('../web-dist'));
 
-httpServer.listen(8000);
+httpServer.listen(process.env.PORT ?? 80);
