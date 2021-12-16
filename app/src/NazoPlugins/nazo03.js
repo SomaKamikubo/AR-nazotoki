@@ -1,8 +1,33 @@
 class Nazo03{
   constructor(){}
 
+  
+
 
   init(engine){
+    function showSumEntity(foundNumbers,i){
+      for(const j of [1,2,3,4,5,6]){
+        engine.getEntity(`nazo03-${j}-entity`).visible = false;
+      }     
+      foundNumbers.push(i);
+  
+      let sumPos = [0,0,0];
+      for (const number of foundNumbers) {
+        for(let s = 0; s < 3; s++){
+          sumPos[s] += engine.getMarker(`nazo03-${number}-marker`).position[s];
+        }
+      }
+      const midlePos = sumPos.map(function(pos){
+        return pos/foundNumbers.length;
+      })
+      
+      const sum = foundNumbers.reduce((prev, curr) => prev + curr, 0);
+      const sumEntity = engine.getEntity(`nazo03-${sum}-entity`);
+      sumEntity.visible = true;
+      sumEntity.position = midlePos;
+      alert(`現在の合計: ${sum}`);
+    }
+
     //registAsset
     for (const i of [1,2,3,4,5,6]){
       engine.registerAsset(`nazo03-${i}-png`,'image',`./assets/nazo03/pop${i}.png`);
@@ -16,30 +41,10 @@ class Nazo03{
       popEntity2.visible = false;
 
       marker.addMarkerFoundEventListener(() => {
-        for(const j of [1,2,3,4,5,6]){
-          engine.getEntity(`nazo03-${j}-entity`).visible = false;
-        }     
-        foundNumbers.push(i);
-        let sumPos = 0;
-        for (const number of foundNumbers) {
-          sumPos += engine.getMarker(`nazo03-${number}-entity`).position;
-        }
-        sumPos = sumPos/foundNumbers.length;
-        alert(sumPos);
-        const sum = foundNumbers.reduce((prev, curr) => prev + curr, 0);
-        sumEntity = engine.getEntity(`nazo03-${sum}-entity`)
-        sumEntity.visible = true;
-        sumEntity.position = marker.position;
-        alert(`現在の合計: ${sum}`);
+        showSumEntity(foundNumbers,i);
       });
       marker.addMarkerLostEventListener(() => {
-        for(const j of [1,2,3,4,5,6]){
-          engine.getEntity(`nazo03-${j}-entity`).visible = false;
-        }
-        foundNumbers = foundNumbers.filter(x => x != i);
-        const sum = foundNumbers.reduce((prev, curr) => prev + curr, 0);
-        alert(`現在の合計: ${sum}`);
-        engine.getEntity(`nazo03-${sum}-entity`).visible = true;
+        showSumEntity(foundNumbers,i);
       });
     }
   }
