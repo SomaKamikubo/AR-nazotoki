@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Test io</title>
+  </head>
+  <body>
+    test io.<br>
+    <button id="emitBtn">emit echo</button>
+  </body>
+  <script src="./socket.io/socket.io.js"></script>
+  <script>
+    const socket = io({
+      path: `${location.pathname}socket.io/`,
+    });
+
+    socket.on('connect', () => {
+      console.log('接続完了!');
+    });
+    socket.on('echo', text => {
+      console.log(text);
+    });
+
+    document.getElementById('emitBtn').onclick = () => {
+      console.log('emit message to server');
+      socket.emit('echo', 'hello from client!');
+    };
+  </script>
+</html>

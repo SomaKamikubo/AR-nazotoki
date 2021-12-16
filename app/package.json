@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "AR謎解き",
   "scripts": {
-    "start": "webpack serve --port 8000",
+    "start": "webpack serve",
     "build": "webpack",
     "prod": "webpack --mode=production"
   },
@@ -18,10 +18,12 @@
   },
   "homepage": "https://github.com/SomaKamikubo/AR-nazotoki#readme",
   "devDependencies": {
-    "budo": "^11.6.4",
     "copy-webpack-plugin": "^10.0.0",
     "webpack": "^5.64.2",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.5.0"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.4.0"
   }
 }

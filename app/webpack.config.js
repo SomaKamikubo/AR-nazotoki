@@ -31,5 +31,8 @@ module.exports = {
     webSocketServer: false,
     liveReload: true,
     hot: false,
+    devMiddleware: {
+      writeToDisk: true,
+    },
   },
 };
