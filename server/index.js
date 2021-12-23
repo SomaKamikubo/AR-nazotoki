@@ -7,21 +7,28 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {});
 
 io.on('connection', (socket) => {
-  console.log(`New connection! id: ${socket.id}, transport: ${socket.conn.transport.name}`);
+  console.log(`New connection! id: ${socket.id}, transport: ${socket.conn.transport.name}, from: ${socket.handshake.headers.referer}`);
 
   socket.on('echo', (text) => {
-    console.log(`${socket.id}: ${text}`);
-    socket.emit('echo', 'Hello from server!');
+    console.log(`Echo: [${socket.id}] ${text}`);
+  });
+
+  socket.on('chat', (mes) => {
+    io.in(socket.data.roomId).emit('chat', socket.id, mes);
+    console.log(`Chat: [${socket.id}] ${mes}`);
   });
 
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
+    socket.data.roomId = roomId;
     console.log(`${socket.id} joined room ${roomId}`);
   });
 
-  socket.on('setReadyGameStartState', (ready) => {
+  socket.on('setReadyGameStartState', async (ready) => {
     socket.data.isReadyGameStart = ready;
-    // TODO
+    const sockets = await io.in(socket.data.roomId).fetchSockets();
+    const readyCount = sockets.filter(s => s.data.isReadyGameStart ?? false).length;
+    io.in(socket.data.roomId).emit('changedReadyState', readyCount, sockets.length);
   });
 
   socket.on('disconnect', (reason) => {
