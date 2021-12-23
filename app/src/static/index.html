@@ -8,7 +8,18 @@
     <h1>AR謎解き</h1>
     <button type="button" onclick="location.href='dl-worksheet.html'">印刷用ページへ</button>
     <button type="button" onclick="location.href='room.html'">プレイ</button>
-    <button type="button" onclick="location.href='commentary.html'">謎解説ページ</button>
+    <button id= "answer" type="button" onclick="location.href='commentary.html'">謎解説ページ</button>
+
+    <script>
+      document.getElementById("answer").style.display="none"
+      var flag = 0
+      function loadFinished(){
+        if(flag == 1){
+          document.getElementById("answer").style.display="block"
+        }
+      }
+      window.onload = loadFinished;
+      </script>
       
   </body>
 </html>
