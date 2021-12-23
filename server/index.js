@@ -18,9 +18,14 @@ io.on('connection', (socket) => {
     console.log(`Chat: [${socket.id}] ${mes}`);
   });
 
-  socket.on('joinRoom', (roomId) => {
+  socket.on('joinRoom', async (roomId, callback) => {
     socket.join(roomId);
     socket.data.roomId = roomId;
+    const sockets = await io.in(roomId).fetchSockets();
+    callback({
+      roomId: roomId,
+      playerCount: sockets.length,
+    });
     console.log(`${socket.id} joined room ${roomId}`);
   });
 

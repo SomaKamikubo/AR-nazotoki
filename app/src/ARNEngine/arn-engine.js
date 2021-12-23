@@ -117,8 +117,10 @@ class ARNEngine {
     socket.on('connect', () => {
       console.log('接続完了!');
       if (searchParams.has('id')){
-        socket.emit('joinRoom', searchParams.get('id'));
-        console.log(`JoinRoom ${searchParams.get('id')}`);
+        socket.emit('joinRoom', searchParams.get('id'), (res) => {
+          console.log(`JoinRoom ${res.roomId}`);
+          console.log(res);
+        });
       }
     });
     

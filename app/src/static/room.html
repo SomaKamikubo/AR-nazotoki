@@ -6,10 +6,32 @@
   </head>
   <body>
     <h2>部屋を立てるか、もう一人が立てた部屋のURLにアクセスしてください。</h2>
-    <button type="button" onclick="location.href='ready.html'">部屋をたてる</button>
+    <button type="button" id="makeRoomButton">部屋をたてる</button>
     <br>
     <button type="button" onclick="location.href='index.html'">タイトルに戻る</button>
     <button type="button" onclick="location.href='dl-worksheet.html'">印刷用ページへ</button>
       
   </body>
+  <script>
+    function generateUuid(){
+      // https://github.com/GoogleChrome/chrome-platform-analytics/blob/master/src/internal/identifier.js
+      // const FORMAT: string = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+      let chars = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".split("");
+      for (let i = 0, len = chars.length; i < len; i++) {
+        switch (chars[i]) {
+          case "x":
+            chars[i] = Math.floor(Math.random() * 16).toString(16);
+            break;
+          case "y":
+            chars[i] = (Math.floor(Math.random() * 4) + 8).toString(16);
+            break;
+        }
+      }
+      return chars.join("");
+    }
+
+    document.getElementById('makeRoomButton').onclick = () => {
+      location.href = `ready.html?id=${generateUuid()}`;
+    };
+  </script>
 </html>

@@ -24,7 +24,7 @@
     socket.on('connect', () => {
       console.log('接続完了!');
       if (searchParams.has('id')){
-        socket.emit('joinRoom', searchParams.get('id'));
+        socket.emit('joinRoom', searchParams.get('id'), (res) => console.log(res));
         console.log(`JoinRoom ${searchParams.get('id')}`);
       }
     });
