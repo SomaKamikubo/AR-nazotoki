@@ -6,15 +6,18 @@ services:
     working_dir: /app
     volumes:
       - ./server:/app
-      - ./app/dist:/web-dist
+      - type: bind
+        source: ./app/dist
+        target: /web-dist
+        read_only: true
     environment:
-      PORT: 8000
+      PORT: 80
       HOST: 0.0.0.0
     # restart: always
     depends_on:
       - web
     ports:
-      - "8000:8000"
+      - "8080:80"
     command: [sh, -c, npm install && npm run start]
 
   web:
