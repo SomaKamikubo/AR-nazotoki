@@ -94,13 +94,22 @@ class ARNEngine {
   }
 
   _connectIO(){
+    const connPath = (location.pathname).split('/').slice(0, -1).join('/');
+    const searchParams = new URLSearchParams(location.search);
+
     const socket = io({
-      path: `${location.pathname}socket.io/`,
+      path: `${connPath}/socket.io/`,
     });
+    console.log(`Connecting to ${connPath}`);
 
     socket.on('connect', () => {
       console.log('接続完了!');
+      if (searchParams.has('id')){
+        socket.emit('joinRoom', searchParams.get('id'));
+        console.log(`JoinRoom ${searchParams.get('id')}`);
+      }
     });
+    
     socket.on('echo', text => {
       console.log(text);
     });
