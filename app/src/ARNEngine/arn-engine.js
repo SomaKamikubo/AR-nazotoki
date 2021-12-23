@@ -73,6 +73,8 @@ class ARNEntity {
   destroy(){
     this.el.destroy();
   }
+
+  
 }
 
 const Utils = {
@@ -80,6 +82,16 @@ const Utils = {
     return vec3.reduce((pre, curr) => pre + ' ' + curr, '');
   }
 };
+
+class ARNMarkerEntity extends ARNEntity{
+  addMarkerFoundEventListener(listener){
+    this.el.addEventListener('markerFound', listener);
+  }
+  addMarkerLostEventListener(listener){
+    this.el.addEventListener('markerLost', listener);
+  }
+
+}
 
 class ARNEngine {
   constructor(sceneId) {
@@ -155,6 +167,8 @@ class ARNEngine {
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
     this.sceneEl.appendChild(markerEl);
+
+    return new ARNMarkerEntity(id);
   }
 
   addEventListener(type, listener){
@@ -163,12 +177,13 @@ class ARNEngine {
 
   getMarker(markerId){
     console.error('未実装です！');
-    return {
-      id: 'id-string',
-      awared: false,
-      position: [0,0,0],
-      rotation: [0,0,0]
-    };
+    return new ARNMarkerEntity(markerId);
+    // return {
+    //   id: 'id-string',
+    //   awared: false,
+    //   position: [0,0,0],
+    //   rotation: [0,0,0]
+    // };
   }
 
   createEntity(id, assetId, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
