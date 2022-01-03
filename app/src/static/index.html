@@ -8,19 +8,30 @@
     <h1>AR謎解き</h1>
     <button type="button" onclick="location.href='dl-worksheet.html'">印刷用ページへ</button>
     <button type="button" onclick="location.href='room.html'">プレイ</button>
-    <button type="button" onclick=openPass()>謎解説ページ</button>
+    <button id="answer" type="button" onclick="location.href='commentary.html'">謎解説ページ</button>
+    <br>
+    <button id="reset" type="button" onclick=init()>リセットボタン</button>
 
       
   </body>
   <script>
-    function openPass(){
-      let answer = prompt("答えを入力してください");
-      if(answer == "答え"){
-        location.href='commentary.html'
-      }else if(answer == null){
-      }else{
-        alert("違います")
+    if(localStorage.length == 0){
+      localStorage.setItem('finish', false);
+    }
+    
+    function viewAnswer(){
+      const answerButton = document.getElementById('answer');
+      if(localStorage.getItem('finish') == 'true'){
+        answerButton.style.visibility = 'visible';
       }
+      else{
+        answerButton.style.visibility = 'hidden';
+      }
+    }
+    window.onload = viewAnswer;
+
+    function init(){
+      localStorage.clear();
     }
   </script>
 </html>
