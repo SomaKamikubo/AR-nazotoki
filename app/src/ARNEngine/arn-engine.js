@@ -90,7 +90,43 @@ class ARNMarkerEntity extends ARNEntity{
   addMarkerLostEventListener(listener){
     this.el.addEventListener('markerLost', listener);
   }
+}
 
+class ARNSyncedMarkerEntity extends ARNEntity {
+  constructor(entityId){
+    super(entityId);
+    this.visible = false;
+    this.internalMarkerEl = document.getElementById(`[System]${entityId}-internal[System]`);
+    this.internalMarkerEl.addEventListener('markerFound', () => this._foundMarker.call(this));
+    this.internalMarkerEl.addEventListener('markerLost', () => this._lostMarker.call(this));
+    this._markerFoundEventListeners = [];
+    this._markerLostEventListeners = [];
+  }
+
+  _foundMarker(){
+    this.visible = true;
+    for (const listener of this._markerFoundEventListeners){
+      listener.call(this);
+    }
+  }
+  _lostMarker(){
+    this.visible = false;
+    for (const listener of this._markerLostEventListeners){
+      listener.call(this);
+    }
+  }
+  _syncTransform(position, rotation, scale){
+    this.position = position;
+    this.rotation = rotation;
+    this.scale = scale;
+  }
+
+  addMarkerFoundEventListener(listener){
+    this._markerFoundEventListeners.push(listener);
+  }
+  addMarkerLostEventListener(listener){
+    this._markerLostEventListeners.push(listener);
+  }
 }
 
 class ARNEngine {
@@ -101,6 +137,14 @@ class ARNEngine {
       return;
     }
     this.plugins = [];
+    this.syncedAreaAnchorMarker = null;
+    this.syncedMarkerEntities = {};
+    this._updateHandlers = [];
+    this._updateTimer = setInterval(() => {
+      for (const handler of this._updateHandlers){
+        handler.call(this);
+      }
+    }, 30); // updateの周期
     this._connectIO();
     this.socket.emit('echo', 'hello from client!');
   }
@@ -127,8 +171,42 @@ class ARNEngine {
     socket.on('echo', text => {
       console.log(text);
     });
+    socket.on('foundSyncedMarker', (markerId, senderId) => {
+      if (markerId in this.syncedMarkerEntities){
+        this.syncedMarkerEntities[markerId]._foundMarker();
+      }
+    });
+    socket.on('lostSyncedMarker', (markerId, senderId) => {
+      if (markerId in this.syncedMarkerEntities){
+        this.syncedMarkerEntities[markerId]._lostMarker();
+      }
+    });
+    socket.on('syncTransform', (objId, position, rotation, scale) => {
+      if (objId in this.syncedMarkerEntities){
+        this.syncedMarkerEntities[objId]._syncTransform(position, rotation, scale);
+      }
+    });
 
     this.socket = socket;
+    this.addUpdateHandler(this._updateSyncedObjects);
+  }
+
+  _updateSyncedObjects(){
+    if (!this.syncedAreaAnchorMarker || !this.syncedAreaAnchorMarker.visible){
+      return;
+    }
+    for (const syncedEntity of Object.values(this.syncedMarkerEntities)){
+      const inEl = syncedEntity.internalMarkerEl;
+      if (inEl && inEl.object3D.visible){
+        // TODO: transform は anchor との相対値
+        // TODO: ローカルでも syncedEntity のtransformを marker のtransformに合わせる。
+        // TODO: ARNEntityからposition等を読むとnullになる原因調査
+        const pos = inEl.object3D.position;
+        const rot = inEl.object3D.rotation;
+        const scale = inEl.object3D.scale;
+        this.socket.emit('syncTransform', [pos.x, pos.y, pos.z], [rot.x, rot.y, rot.z], [scale.x, scale.y, scale.z]);
+      }
+    }
   }
 
   registerNazoPlugin(name, plugin){
@@ -173,19 +251,65 @@ class ARNEngine {
     return new ARNMarkerEntity(id);
   }
 
+  addUpdateHandler(handler){
+    this._updateHandlers.push(handler);
+  }
+
+  setSyncedAreaAnchor(pattUrl){
+    if (this.syncedAreaAnchorMarker){
+      const pUrl = this.syncedAreaAnchorMarker.el.getAttribute('url');
+      if (pattUrl === pUrl){
+        return this.syncedAreaAnchorMarker;
+      }else{
+        this.syncedAreaAnchorMarker.el.remove();
+        this.syncedAreaAnchorMarker = null;
+        console.error('既に登録されているSyncedAreaAnchorMarkerを上書きしました。古いほうを使用しているコードで問題が起きる可能性があります!');
+      }
+    }
+    const markerEl = document.createElement('a-marker');
+    const id = '[System]Synced-Area-Anchor-Marker[System]';
+    markerEl.setAttribute('id', id);
+    markerEl.setAttribute('type', 'pattern');
+    markerEl.setAttribute('url', pattUrl);
+    this.sceneEl.appendChild(markerEl);
+
+    const marker = new ARNMarkerEntity(id);
+    this.syncedAreaAnchorMarker = marker;
+    return marker;
+  }
+
+  registerSyncedMarker(id, pattUrl){
+    if (!this.syncedAreaAnchorMarker){
+      console.error('SyncedMarkerを登録する前に setSyncedAreaAnchor をする必要があります!');
+      return;
+    }
+    const markerEl = document.createElement('a-marker');
+    markerEl.setAttribute('id', `[System]${id}-internal[System]`);
+    markerEl.setAttribute('type', 'pattern');
+    markerEl.setAttribute('url', pattUrl);
+    markerEl.addEventListener('markerFound', () => {
+      this.socket.emit('foundSyncedMarker', id);
+    });
+    markerEl.addEventListener('markerLost', () => {
+      this.socket.emit('lostSyncedMarker', id);
+    });
+    this.sceneEl.appendChild(markerEl);
+
+    const syncedEl = document.createElement('a-entity');
+    syncedEl.setAttribute('id', id);
+    this.syncedAreaAnchorMarker.el.appendChild(syncedEl);
+    const syncedEntity = new ARNSyncedMarkerEntity(id);
+    this.syncedMarkerEntities[id] = syncedEntity;
+
+    return syncedEntity;
+  }
+
   addEventListener(type, listener){
     console.error('未実装です！');
   }
 
   getMarker(markerId){
-    console.error('未実装です！');
     return new ARNMarkerEntity(markerId);
-    // return {
-    //   id: 'id-string',
-    //   awared: false,
-    //   position: [0,0,0],
-    //   rotation: [0,0,0]
-    // };
   }
 
   createEntity(id, assetId, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
