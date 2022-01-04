@@ -13,4 +13,10 @@
     <button type="button" onclick="location.href='room.html'">ゲームを開始する</button>
       
   </body>
+  <script>
+    function gameClear(){
+      localStorage.setItem('finish', true);
+    }
+    window.onload = gameClear;
+  </script>
 </html>

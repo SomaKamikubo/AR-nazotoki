@@ -3,13 +3,18 @@
     <title>Test io</title>
   </head>
   <body>
-    test io.<br>
-    <button id="emitBtn">emit echo</button>
+    <h2>test socket.io</h2>
+    <button id="emitBtn">emit echo</button><br>
+    <p>
+      <span id="readyStateText">0/0</span>  <button id="readyStateChangeButton">ready</button>
+    </p>
   </body>
   <script src="./socket.io/socket.io.js"></script>
   <script>
     const connPath = (location.pathname).split('/').slice(0, -1).join('/');
     const searchParams = new URLSearchParams(location.search);
+
+    let isReady = false;
 
     const socket = io({
       path: `${connPath}/socket.io/`,
@@ -19,7 +24,7 @@
     socket.on('connect', () => {
       console.log('接続完了!');
       if (searchParams.has('id')){
-        socket.emit('joinRoom', searchParams.get('id'));
+        socket.emit('joinRoom', searchParams.get('id'), (res) => console.log(res));
         console.log(`JoinRoom ${searchParams.get('id')}`);
       }
     });
@@ -28,9 +33,17 @@
       console.log(text);
     });
 
+    socket.on('changedReadyState', (readyCount, allCount) => {
+      document.getElementById('readyStateText').textContent = `Ready : ${readyCount}/${allCount}`;
+    });
+
     document.getElementById('emitBtn').onclick = () => {
       console.log('emit message to server');
       socket.emit('echo', 'hello from client!');
+    };
+    document.getElementById('readyStateChangeButton').onclick = () => {
+      isReady = !isReady;
+      socket.emit('setReadyGameStartState', isReady);
     };
   </script>
 </html>
