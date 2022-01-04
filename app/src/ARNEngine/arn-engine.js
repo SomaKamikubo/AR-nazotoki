@@ -13,27 +13,28 @@ class ARNEntity {
     this.el.object3D.visible = v;
   }
 
-  get position(){
+  getPosition(){
     const v = this.el.object3D.position;
     return [v.x, v.y, v.z];
   }
-  set position(newPos){
+  setPosition(newPos){
     this.el.object3D.position.set(...newPos);
   }
 
-  get rotation(){
+  getRotation(){
     const e = this.el.object3D.rotation;
-    return [e.x, e.y, e.z];
+    return [e.x, e.y, e.z, e.w];
   }
-  set rotation(newRotation){
-    this.el.object3D.rotation.setFromVector3(...newRotation);
+  setRotation(newRotation){
+    // this.el.object3D.rotation.setFromVector3(...newRotation);
+    this.el.object3D.rotation.set(...newRotation);
   }
 
-  get scale(){
+  getScale(){
     const s = this.el.object3D.scale;
     return [s.x, s.y, s.z];
   }
-  set scale(newScale){
+  setScale(newScale){
     this.el.object3D.scale.set(...newScale);
   }
 
@@ -73,8 +74,6 @@ class ARNEntity {
   destroy(){
     this.el.destroy();
   }
-
-  
 }
 
 const Utils = {
@@ -115,10 +114,9 @@ class ARNSyncedMarkerEntity extends ARNEntity {
       listener.call(this);
     }
   }
-  _syncTransform(position, rotation, scale){
-    this.position = position;
-    this.rotation = rotation;
-    this.scale = scale;
+  _syncTransform(position, rotation){
+    this.setPosition(position);
+    this.setRotation(rotation);
   }
 
   addMarkerFoundEventListener(listener){
@@ -144,9 +142,8 @@ class ARNEngine {
       for (const handler of this._updateHandlers){
         handler.call(this);
       }
-    }, 30); // updateの周期
+    }, 50); // updateの周期
     this._connectIO();
-    this.socket.emit('echo', 'hello from client!');
   }
 
   _connectIO(){
@@ -181,9 +178,9 @@ class ARNEngine {
         this.syncedMarkerEntities[markerId]._lostMarker();
       }
     });
-    socket.on('syncTransform', (objId, position, rotation, scale) => {
+    socket.on('syncTransform', (objId, position, rotation) => {
       if (objId in this.syncedMarkerEntities){
-        this.syncedMarkerEntities[objId]._syncTransform(position, rotation, scale);
+        this.syncedMarkerEntities[objId]._syncTransform(position, rotation);
       }
     });
 
@@ -195,16 +192,17 @@ class ARNEngine {
     if (!this.syncedAreaAnchorMarker || !this.syncedAreaAnchorMarker.visible){
       return;
     }
+    const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
+    const aRot = this.syncedAreaAnchorMarker.el.object3D.rotation;
     for (const syncedEntity of Object.values(this.syncedMarkerEntities)){
       const inEl = syncedEntity.internalMarkerEl;
       if (inEl && inEl.object3D.visible){
-        // TODO: transform は anchor との相対値
-        // TODO: ローカルでも syncedEntity のtransformを marker のtransformに合わせる。
-        // TODO: ARNEntityからposition等を読むとnullになる原因調査
         const pos = inEl.object3D.position;
         const rot = inEl.object3D.rotation;
-        const scale = inEl.object3D.scale;
-        this.socket.emit('syncTransform', [pos.x, pos.y, pos.z], [rot.x, rot.y, rot.z], [scale.x, scale.y, scale.z]);
+        const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
+        const relRot = [rot.x-aRot.x, rot.y-aRot.y, rot.z-aRot.z, rot.w-aRot.w];
+        syncedEntity._syncTransform(relPos, relRot);
+        this.socket.emit('syncTransform', relPos, relRot);
       }
     }
   }
