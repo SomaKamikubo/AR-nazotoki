@@ -17,17 +17,16 @@ class ARNEntity {
     const v = this.el.object3D.position;
     return [v.x, v.y, v.z];
   }
-  setPosition(newPos){
-    this.el.object3D.position.set(...newPos);
+  setPosition(x,y,z){
+    this.el.object3D.position.set(x,y,z);
   }
 
   getRotation(){
     const e = this.el.object3D.rotation;
     return [e.x, e.y, e.z, e.w];
   }
-  setRotation(newRotation){
-    // this.el.object3D.rotation.setFromVector3(...newRotation);
-    this.el.object3D.rotation.set(...newRotation);
+  setRotation(x,y,z){
+    this.el.object3D.rotation.set(x,y,z);
   }
 
   getScale(){
