@@ -8,6 +8,7 @@ const io = new Server(httpServer, {});
 
 io.on('connection', (socket) => {
   console.log(`New connection! id: ${socket.id}, transport: ${socket.conn.transport.name}, from: ${socket.handshake.headers.referer}`);
+  socket.data.roomId = socket.id; // joinRoomの前に参照しようとして死なないように入れておく。
 
   socket.on('echo', (text) => {
     console.log(`Echo: [${socket.id}] ${text}`);
@@ -34,6 +35,20 @@ io.on('connection', (socket) => {
     const sockets = await io.in(socket.data.roomId).fetchSockets();
     const readyCount = sockets.filter(s => s.data.isReadyGameStart ?? false).length;
     io.in(socket.data.roomId).emit('changedReadyState', readyCount, sockets.length);
+    console.log(`changedReadyState: ${readyCount}, ${sockets.length}`);
+  });
+
+  socket.on('syncTransform', async (objId, position, rotation) => {
+    socket.to(socket.data.roomId).emit('syncTransform', objId, position, rotation);
+    console.log(`syncTransform: ${objId}, ${position}, ${rotation}`);
+  });
+  socket.on('foundSyncedMarker', async (markerId) => {
+    socket.to(socket.data.roomId).emit('foundSyncedMarker', markerId, socket.id);
+    console.log(`foundMarker: ${markerId}, ${socket.id}`);
+  });
+  socket.on('lostSyncedMarker', async (markerId) => {
+    socket.to(socket.data.roomId).emit('lostSyncedMarker', markerId, socket.id);
+    console.log(`lostMarker: ${markerId}, ${socket.id}`);
   });
 
   socket.on('disconnect', (reason) => {
