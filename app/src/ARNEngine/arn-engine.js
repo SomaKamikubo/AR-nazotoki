@@ -167,7 +167,7 @@ class ARNEngine {
       console.log(text);
     });
     socket.on('foundSyncedMarker', (markerId, senderId) => {
-      if (markerId in this.syncedMarkerEntities){
+      if (this.syncedAreaAnchorMarker.visible && markerId in this.syncedMarkerEntities){
         this.syncedMarkerEntities[markerId]._foundMarker();
       }
     });
@@ -179,6 +179,11 @@ class ARNEngine {
     socket.on('syncTransform', (objId, position, rotation) => {
       if (objId in this.syncedMarkerEntities){
         console.log(`syncTransform: ${objId}`);
+        if (this.syncedAreaAnchorMarker.visible && !this.syncedMarkerEntities[objId].visible){
+          this.syncedMarkerEntities[objId]._foundMarker();
+        }else if (!this.syncedAreaAnchorMarker.visible){
+          this.syncedMarkerEntities[objId]._lostMarker();
+        }
         const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
         const aRot = this.syncedAreaAnchorMarker.getRotation();
         const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
@@ -272,6 +277,11 @@ class ARNEngine {
     markerEl.setAttribute('id', id);
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
+    markerEl.addEventListener('markerLost', () => {
+      for (const marker of Object.values(this.syncedMarkerEntities)){
+        marker._lostMarker();
+      }
+    });
     this.sceneEl.appendChild(markerEl);
 
     const marker = new ARNMarkerEntity(id);
