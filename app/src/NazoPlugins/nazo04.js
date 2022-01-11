@@ -1,8 +1,6 @@
 class Nazo04 {
   constructor(){}
   init(engine){
-    let lastRot;
-    
     engine.registerAsset('nazo04-player1-in-png', 'image', './assets/nazo04/player1_in.png');
     engine.registerAsset('nazo04-player1-out-png', 'image', './assets/nazo04/player1_out.png');
     const oneMarker = engine.registerMarker('nazo04-player1-marker1', './assets/nazo03/pattern-Number1.patt');
@@ -13,8 +11,8 @@ class Nazo04 {
     //twoMarkerの傾きの情報を入手するのではなく,最初に移した際の回転情報を0とする.そこからずらすたびに計算を行う.
     const inEntity = engine.createEntity('nazo04-player-in', 'nazo04-player1-in-png', 'nazo04-player1-marker1', [0,0.1,-0.5], [-90,0,0], [1,0.8,1]);
     let changeRotate;
+    let lastRot = 0;
     twoMarker.addMarkerFoundEventListener(() => {
-      lastRot = 0;
       console.log("検知したよ");
       changeRotate = setInterval(() => {
         inEntity.setRotation(-90,lastRot+0.1,0);
