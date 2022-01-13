@@ -22,11 +22,10 @@ class ARNEntity {
   }
 
   getRotation(){
-    const e = this.el.object3D.rotation;
-    return [e.x, e.y, e.z, e.w];
+    return this.el.object3D.rotation.toArray();
   }
-  setRotation(x,y,z){
-    this.el.object3D.rotation.set(x,y,z);
+  setRotation(newRotation){
+    this.el.object3D.rotation.fromArray(newRotation);
   }
 
   getScale(){
@@ -188,7 +187,7 @@ class ARNEngine {
       console.log(text);
     });
     socket.on('foundSyncedMarker', (markerId, senderId) => {
-      if (markerId in this.syncedMarkerEntities){
+      if (this.syncedAreaAnchorMarker.visible && markerId in this.syncedMarkerEntities){
         this.syncedMarkerEntities[markerId]._foundMarker();
       }
     });
@@ -199,7 +198,16 @@ class ARNEngine {
     });
     socket.on('syncTransform', (objId, position, rotation) => {
       if (objId in this.syncedMarkerEntities){
-        this.syncedMarkerEntities[objId]._syncTransform(position, rotation);
+        if (this.syncedAreaAnchorMarker.visible && !this.syncedMarkerEntities[objId].visible){
+          this.syncedMarkerEntities[objId]._foundMarker();
+        }else if (!this.syncedAreaAnchorMarker.visible){
+          this.syncedMarkerEntities[objId]._lostMarker();
+        }
+        const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
+        const aRot = this.syncedAreaAnchorMarker.getRotation();
+        const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
+        const rot = [aRot[0]+rotation[0], aRot[1]+rotation[1], aRot[2]+rotation[2], rotation[3]];
+        this.syncedMarkerEntities[objId]._syncTransform(pos, rot);
       }
     });
     socket.on('syncState', (entityId, name, value) => {
@@ -217,16 +225,16 @@ class ARNEngine {
       return;
     }
     const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
-    const aRot = this.syncedAreaAnchorMarker.el.object3D.rotation;
+    const aRot = this.syncedAreaAnchorMarker.getRotation();
     for (const syncedEntity of Object.values(this.syncedMarkerEntities)){
       const inEl = syncedEntity.internalMarkerEl;
       if (inEl && inEl.object3D.visible){
         const pos = inEl.object3D.position;
         const rot = inEl.object3D.rotation;
         const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
-        const relRot = [rot.x-aRot.x, rot.y-aRot.y, rot.z-aRot.z, rot.w-aRot.w];
-        syncedEntity._syncTransform(relPos, relRot);
-        this.socket.emit('syncTransform', relPos, relRot);
+        const relRot = [rot.x-aRot[0], rot.y-aRot[1], rot.z-aRot[2], aRot[3]];
+        syncedEntity._syncTransform([pos.x, pos.y, pos.z], rot.toArray());
+        this.socket.emit('syncTransform', syncedEntity.id, relPos, relRot);
       }
     }
   }
@@ -293,6 +301,11 @@ class ARNEngine {
     markerEl.setAttribute('id', id);
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
+    markerEl.addEventListener('markerLost', () => {
+      for (const marker of Object.values(this.syncedMarkerEntities)){
+        marker._lostMarker();
+      }
+    });
     this.sceneEl.appendChild(markerEl);
 
     const marker = new ARNMarkerEntity(id);
@@ -319,7 +332,7 @@ class ARNEngine {
 
     const syncedEl = document.createElement('a-entity');
     syncedEl.setAttribute('id', id);
-    this.syncedAreaAnchorMarker.el.appendChild(syncedEl);
+    this.sceneEl.appendChild(syncedEl);
     const syncedEntity = new ARNSyncedMarkerEntity(id);
     syncedEntity._stateChangeEmitter = (name, value) => {
       this.socket.emit('syncState', id, name, value);
