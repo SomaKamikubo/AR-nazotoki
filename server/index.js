@@ -50,6 +50,10 @@ io.on('connection', (socket) => {
     socket.to(socket.data.roomId).emit('lostSyncedMarker', markerId, socket.id);
     console.log(`lostMarker: ${markerId}, ${socket.id}`);
   });
+  socket.on('syncState', async (entityId, name, value) => {
+    socket.to(socket.data.roomId).emit('syncState', entityId, name, value);
+    console.log(`syncState: ${entityId}, ${name}, (${value})`);
+  });
 
   socket.on('disconnect', (reason) => {
     console.log(`Disconnect client (${reason}) id: ${socket.id}`);

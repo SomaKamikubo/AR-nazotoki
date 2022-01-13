@@ -99,6 +99,26 @@ class ARNSyncedMarkerEntity extends ARNEntity {
     this.internalMarkerEl.addEventListener('markerLost', () => this._lostMarker.call(this));
     this._markerFoundEventListeners = [];
     this._markerLostEventListeners = [];
+    this._state = {};
+    this._stateChangeListeners = [];
+    this._stateChangeEmitter = null;
+  }
+
+  get state(){
+    return this._state;
+  }
+  commitState(name, value, noSync=false){
+    const oldValue = this._state[name];
+    this._state[name] = value;
+    if (!noSync){
+      this._stateChangeEmitter?.call(this, [name, value]);
+    }
+    for (const listener of this._stateChangeListeners){
+      listener.call(this, [name, oldValue, value]);
+    }
+  }
+  addStateChangeListener(listener){
+    this._stateChangeListeners.push(listener);
   }
 
   _foundMarker(){
@@ -180,6 +200,11 @@ class ARNEngine {
     socket.on('syncTransform', (objId, position, rotation) => {
       if (objId in this.syncedMarkerEntities){
         this.syncedMarkerEntities[objId]._syncTransform(position, rotation);
+      }
+    });
+    socket.on('syncState', (entityId, name, value) => {
+      if (entityId in this.syncedMarkerEntities){
+        this.syncedMarkerEntities[entityId].commitState(name, value, true);
       }
     });
 
@@ -296,6 +321,9 @@ class ARNEngine {
     syncedEl.setAttribute('id', id);
     this.syncedAreaAnchorMarker.el.appendChild(syncedEl);
     const syncedEntity = new ARNSyncedMarkerEntity(id);
+    syncedEntity._stateChangeEmitter = (name, value) => {
+      this.socket.emit('syncState', id, name, value);
+    };
     this.syncedMarkerEntities[id] = syncedEntity;
 
     return syncedEntity;
