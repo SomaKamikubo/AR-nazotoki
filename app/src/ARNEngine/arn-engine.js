@@ -178,7 +178,6 @@ class ARNEngine {
     });
     socket.on('syncTransform', (objId, position, rotation) => {
       if (objId in this.syncedMarkerEntities){
-        console.log(`syncTransform: ${objId}`);
         if (this.syncedAreaAnchorMarker.visible && !this.syncedMarkerEntities[objId].visible){
           this.syncedMarkerEntities[objId]._foundMarker();
         }else if (!this.syncedAreaAnchorMarker.visible){

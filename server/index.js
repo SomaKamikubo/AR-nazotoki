@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
 
   socket.on('syncTransform', async (objId, position, rotation) => {
     socket.to(socket.data.roomId).emit('syncTransform', objId, position, rotation);
-    console.log(`syncTransform: ${objId}, ${position}, ${rotation}`);
+    // console.log(`syncTransform: ${objId}, ${position}, ${rotation}`);
   });
   socket.on('foundSyncedMarker', async (markerId) => {
     socket.to(socket.data.roomId).emit('foundSyncedMarker', markerId, socket.id);
