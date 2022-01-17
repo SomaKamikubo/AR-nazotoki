@@ -142,6 +142,7 @@ class ARNEngine {
       }
     }, 50); // updateの周期
     this._connectIO();
+    this.registerAsset('defaultAssets','image', './assets/common/greenframe.png');
   }
 
   _connectIO(){
@@ -248,7 +249,7 @@ class ARNEngine {
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
     this.sceneEl.appendChild(markerEl);
-
+    this.createEntity('${id}_default','defaultAssets',id,[0,-0.1,0], [-90,0,0], [1,1,1]);
     return new ARNMarkerEntity(id);
   }
 
@@ -301,7 +302,6 @@ class ARNEngine {
     this.sceneEl.appendChild(syncedEl);
     const syncedEntity = new ARNSyncedMarkerEntity(id);
     this.syncedMarkerEntities[id] = syncedEntity;
-
     return syncedEntity;
   }
 
