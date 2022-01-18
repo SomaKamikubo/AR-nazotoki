@@ -17,8 +17,8 @@ class ARNEntity {
     const v = this.el.object3D.position;
     return [v.x, v.y, v.z];
   }
-  setPosition(x,y,z){
-    this.el.object3D.position.set(x,y,z);
+  setPosition(newPos){
+    this.el.object3D.position.set(...newPos);
   }
 
   getRotation(){
