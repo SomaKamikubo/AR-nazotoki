@@ -1,31 +1,27 @@
 class Nazo04 {
   constructor(){}
   init(engine){
-    engine.registerAsset('nazo04-player1-in-png', 'image', './assets/nazo04/player1_in.png');
-    engine.registerAsset('nazo04-player1-out-png', 'image', './assets/nazo04/player1_out.png');
+    engine.registerAsset('nazo04-player1-in-png', 'image', './assets/nazo04/player1/player1_in.png');
+    engine.registerAsset('nazo04-player1-out-png', 'image', './assets/nazo04//player1/player1_out.png');
     
-    
-    // //表示されるEntityは分けたい
     // //Markerを変えたい.
-    // //マーカーが検知されているかをユーザーにわかりやすくしたい
     // //rotationの初期値は,雑な数字に.
-
 
     function showEntity(foundNumbers){
       const sum = foundNumbers.reduce((prev, curr) => prev + curr, 0);
       if(sum == 3){
-        alert(3)
+        //alert(3)
         engine.getEntity('nazo04-player-1').visible = true;
         engine.getEntity('nazo04-player-2').visible = false;
       
         
       }else if(sum == 2){
-        alert(2)
+        //alert(2)
         engine.getEntity('nazo04-player-1').visible = false;
         engine.getEntity('nazo04-player-2').visible = true;
 
       }else if(sum == 1){
-        alert(1)
+        //alert(1)
         engine.getEntity('nazo04-player-1').visible = false;
         engine.getEntity('nazo04-player-2').visible = false;
 
@@ -40,10 +36,10 @@ class Nazo04 {
     let beforeMarkerRot = null;
 
     for (const i of [1, 2]){
-      const marker = engine.registerMarker(`nazo04-player1-marker${i}`, `./assets/nazo03/pattern-Number${i}.patt`);
-      const popEntity = engine.createEntity(`nazo04-player-${i}`, `nazo04-player1-in-png`, `nazo04-player1-marker${i}`, [0,-0.1,-0.5], [-90,0,0], [1,0.8,1]);    
+      const marker = engine.registerMarker(`nazo04-player1-marker${i}`, `./assets/nazo04/player1/pattern-kaiga${i+1}.patt`);
+      const popEntity = engine.createEntity(`nazo04-player-${i}`, `nazo04-player1-in-png`, `nazo04-player1-marker${i}`, [0,0,-0.5], [-90,0,0], [1.2,1,1.2]);    
       popEntity.visible = false;
-      engine.createEntity('nazo04-player-out', 'nazo04-player1-out-png', 'nazo04-player1-marker1', [0,0,-0.5], [-90,0,0], [1,0.8,1]);
+      engine.createEntity('nazo04-player-out', 'nazo04-player1-out-png', 'nazo04-player1-marker1', [0,0.1,-0.5], [-90,0,0], [1,0.8,1]);
 
       
     //markerを見つけた時
