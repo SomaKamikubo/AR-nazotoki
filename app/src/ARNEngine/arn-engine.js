@@ -209,6 +209,7 @@ class ARNEngine {
         const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
         const rot = [aRot[0]+rotation[0], aRot[1]+rotation[1], aRot[2]+rotation[2], rotation[3]];
         this.syncedMarkerEntities[objId]._syncTransform(pos, rot, scale);
+        console.log(`sync: ${objId}`);
       }
     });
     socket.on('syncState', (entityId, name, value) => {
@@ -222,9 +223,7 @@ class ARNEngine {
   }
 
   _updateSyncedObjects(){
-    if (!this.syncedAreaAnchorMarker || !this.syncedAreaAnchorMarker.visible){
-      return;
-    }
+    const aVisible = this.syncedAreaAnchorMarker && this.syncedAreaAnchorMarker.visible;
     const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
     const aRot = this.syncedAreaAnchorMarker.getRotation();
     for (const syncedEntity of Object.values(this.syncedMarkerEntities)){
@@ -233,10 +232,12 @@ class ARNEngine {
         const pos = inEl.object3D.position;
         const rot = inEl.object3D.rotation;
         const scale = inEl.object3D.scale;
-        const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
-        const relRot = [rot.x-aRot[0], rot.y-aRot[1], rot.z-aRot[2], aRot[3]];
         syncedEntity._syncTransform(pos.toArray(), rot.toArray(), scale.toArray());
-        this.socket.emit('syncTransform', syncedEntity.id, relPos, relRot, scale.toArray());
+        if (aVisible){
+          const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
+          const relRot = [rot.x-aRot[0], rot.y-aRot[1], rot.z-aRot[2], aRot[3]];
+          this.socket.emit('syncTransform', syncedEntity.id, relPos, relRot, scale.toArray());
+        }
       }
     }
   }
@@ -326,7 +327,9 @@ class ARNEngine {
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
     markerEl.addEventListener('markerFound', () => {
-      this.socket.emit('foundSyncedMarker', id);
+      if (this.syncedAreaAnchorMarker && this.syncedAreaAnchorMarker.visible){
+        this.socket.emit('foundSyncedMarker', id);
+      }
     });
     markerEl.addEventListener('markerLost', () => {
       this.socket.emit('lostSyncedMarker', id);
