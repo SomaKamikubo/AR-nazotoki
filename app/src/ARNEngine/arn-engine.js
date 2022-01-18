@@ -209,7 +209,7 @@ class ARNEngine {
         const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
         const rot = [aRot[0]+rotation[0], aRot[1]+rotation[1], aRot[2]+rotation[2], rotation[3]];
         this.syncedMarkerEntities[objId]._syncTransform(pos, rot, scale);
-        console.log(`sync: ${objId}`);
+        // console.log(`sync: ${objId}`);
       }
     });
     socket.on('syncState', (entityId, name, value) => {
