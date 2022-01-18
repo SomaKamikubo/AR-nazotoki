@@ -42,11 +42,13 @@ class Nazo04 {
     const syncedAreaAnchorMarker = engine.setSyncedAreaAnchor('./assets/share_marker.patt');
     const aMarker = engine.registerSyncedMarker('nazo04-img-a-marker', './assets/nazo04/pattern-Number1.patt');
     const bMarker = engine.registerSyncedMarker('nazo04-img-b-marker', './assets/nazo04/pattern-Number2.patt');
-    const cubeId = engine.registerAsset('nazo04-tap-cube-model', '3d-model', './assets/nazo04/TapCube.glb');
+    const cubeTexId = engine.registerAsset('nazo04-tap-cube-tex', 'image', './assets/nazo04/pls_tap_img.png');
     const clearImgPl1Id = engine.registerAsset('nazo04-clear-pl1-img', 'image', './assets/nazo04/clear_player1_b.png');
     const clearImgPl2Id = engine.registerAsset('nazo04-clear-pl2-img', 'image', './assets/nazo04/clear_player2.png');
-    const cubeEntPl1 = engine.createEntity('nazo04-tap-cube-pl1', cubeId, aMarker.id);
-    const cubeEntPl2 = engine.createEntity('nazo04-tap-cube-pl2', cubeId, bMarker.id);
+    const cubeEntPl1 = engine.createEntityFromPrimShape('nazo04-tap-cube-pl1', 'box', aMarker.id);
+    cubeEntPl1.el.setAttribute('material', `shader: flat; src: #${cubeTexId};`);
+    const cubeEntPl2 = engine.createEntityFromPrimShape('nazo04-tap-cube-pl2', 'box', bMarker.id);
+    cubeEntPl2.el.setAttribute('material', `shader: flat; src: #${cubeTexId};`);
     const clearImgEntPl1 = engine.createEntity('nazo04-clear-pl1', clearImgPl1Id, aMarker.id);
     const clearImgEntPl2 = engine.createEntity('nazo04-clear-pl2', clearImgPl2Id, bMarker.id);
     aMarker.addStateChangeListener((name, oldValue, value) => {

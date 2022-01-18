@@ -107,13 +107,13 @@ class ARNSyncedMarkerEntity extends ARNEntity {
     return this._state;
   }
   commitState(name, value, noSync=false){
-    const oldValue = this._state[name];
+    const oldValue = this._state[name] ?? null;
     this._state[name] = value;
     if (!noSync){
-      this._stateChangeEmitter?.call(this, [name, value]);
+      this._stateChangeEmitter?.call(this, name, value);
     }
     for (const listener of this._stateChangeListeners){
-      listener.call(this, [name, oldValue, value]);
+      listener.call(this, name, oldValue, value);
     }
   }
   addStateChangeListener(listener){
@@ -374,6 +374,22 @@ class ARNEngine {
     }
     newEntityEl.setAttribute('id', id);
     newEntityEl.setAttribute('src', `#${assetId}`);
+    newEntityEl.setAttribute('position', `${Utils.vec3ToStr(position)}`);
+    newEntityEl.setAttribute('rotation', `${Utils.vec3ToStr(rotation)}`);
+    newEntityEl.setAttribute('scale', `${Utils.vec3ToStr(scale)}`);
+    if (parentEntityId){
+      const parentEl = document.getElementById(parentEntityId);
+      parentEl.appendChild(newEntityEl);
+    }else{
+      this.sceneEl.appendChild(newEntityEl);
+    }
+    return new ARNEntity(id);
+  }
+
+  createEntityFromPrimShape(id, shapeName, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
+    const newEntityEl = document.createElement('a-entity');
+    newEntityEl.setAttribute('geometry', `primitive: ${shapeName}`);
+    newEntityEl.setAttribute('id', id);
     newEntityEl.setAttribute('position', `${Utils.vec3ToStr(position)}`);
     newEntityEl.setAttribute('rotation', `${Utils.vec3ToStr(rotation)}`);
     newEntityEl.setAttribute('scale', `${Utils.vec3ToStr(scale)}`);
