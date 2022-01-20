@@ -38,9 +38,9 @@ io.on('connection', (socket) => {
     console.log(`changedReadyState: ${readyCount}, ${sockets.length}`);
   });
 
-  socket.on('syncTransform', async (objId, position, rotation) => {
-    socket.to(socket.data.roomId).emit('syncTransform', objId, position, rotation);
-    // console.log(`syncTransform: ${objId}, ${position}, ${rotation}`);
+  socket.on('syncTransform', async (objId, position, rotation, scale) => {
+    socket.to(socket.data.roomId).emit('syncTransform', objId, position, rotation, scale);
+    console.log(`syncTransform: ${objId}, ${position}, ${rotation}, ${scale}`);
   });
   socket.on('foundSyncedMarker', async (markerId) => {
     socket.to(socket.data.roomId).emit('foundSyncedMarker', markerId, socket.id);

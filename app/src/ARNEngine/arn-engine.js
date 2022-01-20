@@ -132,9 +132,10 @@ class ARNSyncedMarkerEntity extends ARNEntity {
       listener.call(this);
     }
   }
-  _syncTransform(position, rotation){
+  _syncTransform(position, rotation, scale){
     this.setPosition(position);
     this.setRotation(rotation);
+    this.setScale(scale);
   }
 
   addMarkerFoundEventListener(listener){
@@ -197,7 +198,7 @@ class ARNEngine {
         this.syncedMarkerEntities[markerId]._lostMarker();
       }
     });
-    socket.on('syncTransform', (objId, position, rotation) => {
+    socket.on('syncTransform', (objId, position, rotation, scale) => {
       if (objId in this.syncedMarkerEntities){
         if (this.syncedAreaAnchorMarker.visible && !this.syncedMarkerEntities[objId].visible){
           this.syncedMarkerEntities[objId]._foundMarker();
@@ -208,7 +209,7 @@ class ARNEngine {
         const aRot = this.syncedAreaAnchorMarker.getRotation();
         const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
         const rot = [aRot[0]+rotation[0], aRot[1]+rotation[1], aRot[2]+rotation[2], rotation[3]];
-        this.syncedMarkerEntities[objId]._syncTransform(pos, rot);
+        this.syncedMarkerEntities[objId]._syncTransform(pos, rot, scale);
       }
     });
     socket.on('syncState', (entityId, name, value) => {
@@ -232,10 +233,11 @@ class ARNEngine {
       if (inEl && inEl.object3D.visible){
         const pos = inEl.object3D.position;
         const rot = inEl.object3D.rotation;
+        const scale = inEl.object3D.scale;
         const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
         const relRot = [rot.x-aRot[0], rot.y-aRot[1], rot.z-aRot[2], aRot[3]];
-        syncedEntity._syncTransform([pos.x, pos.y, pos.z], rot.toArray());
-        this.socket.emit('syncTransform', syncedEntity.id, relPos, relRot);
+        syncedEntity._syncTransform(pos.toArray(), rot.toArray(), scale.toArray());
+        this.socket.emit('syncTransform', syncedEntity.id, relPos, relRot, scale.toArray());
       }
     }
   }
@@ -270,6 +272,7 @@ class ARNEngine {
     newAssetEl.setAttribute('src', url);
     newAssetEl.setAttribute('arne-asset-type', type);
     assetsContainer.appendChild(newAssetEl);
+    return id;
   }
 
   registerMarker(id, pattUrl){
