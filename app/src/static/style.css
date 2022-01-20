@@ -1,0 +1,12 @@
+html {
+  font-size: 2vh;
+}
+
+body {
+  background-color: rgb(250, 250, 250);
+}
+
+.bg-img {
+  background: url('header_image2.png') center center;
+  background-size: cover;
+}

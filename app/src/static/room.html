@@ -3,89 +3,23 @@
   <head>
     <meta charset="utf-8">
     <title>ルーム作成</title>
-    <style>
-    header {
-      position: relative;
-      height: 50vh;
-    }
-
-    header {
-      background: url(header_image.png) center / cover;
-
-    }
-
-    .btn-square-shadow {
-      width: 180px;
-      height: 40px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #00FF00;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-
-      .btn-square-shadow2 {
-      width: 180px;
-      height: 40px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #FF0000;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow2:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-      .btn-square-shadow3 {
-      width: 180px;
-      height: 40px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #FF44FF;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow3:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-  </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <header>
-      <small class="caption">license</small>
-    </header>
-    <h2 style="text-align:center">
-    <p>部屋を立てるか、もう一人が立てた部屋のURLにアクセスしてください。</p>
-    <a href="#" class="btn-square-shadow" id="makeRoomButton">部屋をたてる</a>
-    <p>
-    <a href="#" class="btn-square-shadow2" onclick="location.href='index.html'">タイトルに戻る</a>
-    <a href="#" class="btn-square-shadow3" onclick="location.href='dl-worksheet.html'">印刷用ページへ</a>
-    </p>
-    </h2>
+    <section class="hero bg-img is-medium">
+      <div class="hero-body"></div>
+    </section>
+    <div class="container mt-4">
+      <h2>部屋を立てるか、もう一人が立てた部屋のURLにアクセスしてください。</h2>
+      <div class="block has-text-centered mt-4">
+        <a href="#" class="button is-medium is-primary is-outlined" id="makeRoomButton">部屋をたてる</a>
+      </div>
+      <div class="block has-text-centered">
+        <a href="#" class="button is-medium is-outlined" onclick="location.href='index.html'">タイトルに戻る</a>
+        <a href="#" class="button is-medium is-link is-outlined" onclick="location.href='dl-worksheet.html'">印刷用ページへ</a>
+      </div>
+    </div>
   </body>
   <script>
     function generateUuid(){

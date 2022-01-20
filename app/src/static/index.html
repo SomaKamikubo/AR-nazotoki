@@ -3,140 +3,34 @@
   <head>
     <meta charset="utf-8">
     <title>AR謎解き</title>
-    <style>
-      header {
-        position: relative;
-        height: 50vh;
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+      window.onload = function() {
+        const isFinished = localStorage.getItem('ARN.isFinished');
+        const answerButton = document.getElementById('answer');
+        if (isFinished){
+          answerButton.style.visibility = 'visible';
+        }else{
+          answerButton.style.visibility = 'hidden';
+        }
       }
-  
-      header {
-        background: url(header_image.png) center / cover;
-      }
-
-      .heading17 {
-	    padding-bottom: 10px;
-	    font-size: 45px;
-	    background-image: repeating-linear-gradient(90deg, #b4a983 0, #b4a983 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 4px);
-	    background-size: 4px 4px;
-	    background-repeat: repeat-x;
-	    background-position: center bottom;
-      }
-
-      .btn-square-shadow {
-      width: 300px;
-      height: 60px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #00FF00;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-
-      .btn-square-shadow2 {
-      width: 180px;
-      height: 40px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #00FFFF;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow2:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-      .btn-square-shadow3 {
-      width: 180px;
-      height: 40px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #FF44FF;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow3:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-
-      .btn-square-shadow4 {
-      width: 180px;
-      height: 40px;
-      display: inline-block;
-      padding: 0.7em 1em;
-      text-align: center;
-      ext-decoration: none;
-      background: #FFC7AF;/*ボタン色*/
-      color: #FFF;
-      border-bottom: solid 4px #627295;
-      border-radius: 3px;
-      }
-    .btn-square-shadow4:active {
-    /*ボタンを押したとき*/
-      -webkit-transform: translateY(4px);
-      transform: translateY(4px);/*下に動く*/
-      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
-      border-bottom: none;
-      }
-    </style> 
+    </script>
   </head>
   <body>
-    <header>
-      <small class="caption">license</small>
-    </header>
-    <h2 style="text-align:center">
-    <a href="#" class="btn-square-shadow" onclick="location.href='room.html'">はじめる</button></a>
-    <p>
-    <a href="#" class="btn-square-shadow2" onclick="location.href='dl-worksheet.html'">印刷用ページへ</button></a>
-    
-    <a href="#" class="btn-square-shadow3" onclick="location.href='commentary.html'">謎解説ページ</button></a>
-    </p>
-    <p>
-    <a href="#" class="btn-square-shadow4" onclick=init()>リセット</button></a>
-    </p>
-    </h2>
-      
+    <section class="hero is-medium bg-img">
+      <div class="hero-body"></div>
+    </section>
+    <div class="container mt-4">
+      <div class="block has-text-centered">
+        <a href="#" class="button is-medium is-link" style="font-size: 4vh;" onclick="location.href='dl-worksheet.html'">印刷用ページへ</a>
+      </div>
+      <div class="block has-text-centered">
+        <a href="#" class="button is-medium is-link" style="font-size: 4vh;" onclick="location.href='room.html'">はじめる</a>
+      </div>
+      <div class="block has-text-centered">
+        <a href="#" class="button is-medium is-link" style="font-size: 4vh; visibility: hidden;" onclick="location.href='commentary.html'" id="answer">謎解説ページ</a>
+      </div>
+    </div>
   </body>
-  <script>
-    if(localStorage.length == 0){
-      localStorage.setItem('finish', false);
-    }
-    
-    function viewAnswer(){
-      const answerButton = document.getElementById('answer');
-      if(localStorage.getItem('finish') == 'true'){
-        answerButton.style.visibility = 'visible';
-      }
-      else{
-        answerButton.style.visibility = 'hidden';
-      }
-    }
-    window.onload = viewAnswer;
-
-    function init(){
-      localStorage.clear();
-    }
-  </script>
 </html>
