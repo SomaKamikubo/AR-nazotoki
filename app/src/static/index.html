@@ -5,17 +5,6 @@
     <title>AR謎解き</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="style.css">
-    <script>
-      window.onload = function() {
-        const isFinished = localStorage.getItem('ARN.isFinished');
-        const answerButton = document.getElementById('answer');
-        if (isFinished){
-          answerButton.style.visibility = 'visible';
-        }else{
-          answerButton.style.visibility = 'hidden';
-        }
-      }
-    </script>
   </head>
   <body>
     <section class="hero is-medium bg-img">
@@ -37,7 +26,7 @@
         <a href="#" class="button is-medium is-link" style="font-size: 4vh;" onclick="location.href='room.html'">はじめる</a>
       </div>
       <div class="block has-text-centered">
-        <a href="#" class="button is-medium is-link" style="font-size: 4vh; visibility: hidden;" onclick="location.href='commentary.html'" id="answer">謎解説ページ</a>
+        <a href="#" class="button is-medium is-link" style="font-size: 4vh;" onclick="location.href='commentary.html'" id="answer">謎解説ページ</a>
       </div>
     </div>
   </body>
