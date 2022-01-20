@@ -3,19 +3,52 @@
   <head>
     <meta charset="utf-8">
     <title>マッチングページ</title>
+    <style>
+      header {
+	      position: relative;
+	      height: 50vh;
+      }
+      header {
+	      background: url(header_image.png) center / cover;
+      }
+      .btn-square-shadow {
+        display: inline-block;
+      padding: 0.5em 1em;
+      ext-decoration: none;
+      background: #668ad8;/*ボタン色*/
+      color: #FFF;
+      border-bottom: solid 4px #627295;
+      border-radius: 3px;
+      }
+    .btn-square-shadow:active {
+    /*ボタンを押したとき*/
+      -webkit-transform: translateY(4px);
+      transform: translateY(4px);/*下に動く*/
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
+      border-bottom: none;
+      }
+
+  </style>
   </head>
   <body>
+    <header>
+      <small class="caption">license</small>
+    </header>
+    <h2 style="text-align:center">
     <div id="linkShareBox" style="display: none;">
       <h2>下のリンクをもう一人に共有してください</h2>
       <input id="roomLinkInput" type="text" value="https://assam.tea.ie.u-ryukyu.ac.jp/teamar/ready" readonly>
       <button onclick="copyToClipboard()">リンクをコピー</button>
     </div>
-  
+    </h2>
     <br><br>
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/gg5GT0kku4U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <h2 style="text-align:center">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/rGLHuiP3nOY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <br>
-    <p>動画を見終わったら準備完了ボタンを押してください</p>
-    <p><span id="readyStateText">準備完了: 0/2</span>  <button type="button" id="readyStateChangeButton">準備完了</button></p>
+    <br><br>
+    <p>動画を見終わったら準備完了ボタンを押してください↓</p>
+    <p><span id="readyStateText">準備完了: 0/2</span> <a href="#" class="btn-square-shadow" id="readyStateChangeButton">準備完了</button></a></p>
+  </h2>
   </body>
   <script src="./socket.io/socket.io.js"></script>
   <script>

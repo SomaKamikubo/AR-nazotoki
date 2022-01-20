@@ -3,11 +3,45 @@
   <head>
     <meta charset="utf-8">
     <title>クリアページ</title>
+    <style>
+      header {
+	      position: relative;
+	      height: 50vh;
+      }
+      header {
+	      background: url(header_image.png) center / cover;
+      }
+      .size_test {
+    font-size:  40px;    /* 文字サイズ指定 */
+  }
+  .btn-square-shadow {
+        display: inline-block;
+      padding: 0.5em 1em;
+      ext-decoration: none;
+      background: #668ad8;/*ボタン色*/
+      color: #FFF;
+      border-bottom: solid 4px #627295;
+      border-radius: 3px;
+      }
+    .btn-square-shadow:active {
+    /*ボタンを押したとき*/
+      -webkit-transform: translateY(4px);
+      transform: translateY(4px);/*下に動く*/
+      box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);/*影を小さく*/
+      border-bottom: none;
+      }
+
+  </style>
+
   </head>
   <body>
-    <p>クリアおめでとう</p>
+    <header>
+      <small class="caption">license</small>
+    </header>
+    <h2 style="text-align:center">
+    <div class="size_test"><p>クリアおめでとう!!</p></div>
     <br>
-    <button type="button" onclick="location.href='commentary.html'">解説ページへ</button>
-      
+    <a href="#" class="btn-square-shadow" onclick="location.href='commentary.html'">解説ページへ</a>
+  </h2>
   </body>
 </html>
