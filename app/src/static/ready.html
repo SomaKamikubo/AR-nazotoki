@@ -3,19 +3,36 @@
   <head>
     <meta charset="utf-8">
     <title>マッチングページ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <div id="linkShareBox" style="display: none;">
-      <h2>下のリンクをもう一人に共有してください</h2>
-      <input id="roomLinkInput" type="text" value="https://assam.tea.ie.u-ryukyu.ac.jp/teamar/ready" readonly>
-      <button onclick="copyToClipboard()">リンクをコピー</button>
+    <section class="hero is-medium bg-img">
+      <div class="hero-body"></div>
+    </section>
+    <div class="container mt-4">
+      <div class="block has-text-centered mt-4">
+        <div id="linkShareBox" class="box" style="display: none;">
+          <h2>下のリンクをもう一人に共有してください</h2>
+          <div class="columns is-gapless">
+            <div class="column">
+              <input id="roomLinkInput" type="text" value="https://assam.tea.ie.u-ryukyu.ac.jp/teamar/ready" readonly class="input">
+            </div>
+            <div class="column is-one-fifth">
+              <button onclick="copyToClipboard()" class="button is-primary">コピー</button>
+            </div>
+          </div>
+        </div>
+        <div class="iframe-wrapper">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/rGLHuiP3nOY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p>動画を見終わったら準備完了ボタンを押してください↓</p>
+        <p><span id="readyStateText">準備完了: 0/2</span></p> 
+        <p class="mb-4"><a class="button is-primary is-light" id="readyStateChangeButton">準備完了</a></p>
+      </div>
     </div>
-  
-    <br><br>
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/rGLHuiP3nOY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    <br>
-    <p>動画を見終わったら準備完了ボタンを押してください</p>
-    <p><span id="readyStateText">準備完了: 0/2</span>  <button type="button" id="readyStateChangeButton">準備完了</button></p>
+    
+  </h2>
   </body>
   <script src="./socket.io/socket.io.js"></script>
   <script>
