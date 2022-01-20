@@ -98,6 +98,26 @@ class ARNSyncedMarkerEntity extends ARNEntity {
     this.internalMarkerEl.addEventListener('markerLost', () => this._lostMarker.call(this));
     this._markerFoundEventListeners = [];
     this._markerLostEventListeners = [];
+    this._state = {};
+    this._stateChangeListeners = [];
+    this._stateChangeEmitter = null;
+  }
+
+  get state(){
+    return this._state;
+  }
+  commitState(name, value, noSync=false){
+    const oldValue = this._state[name];
+    this._state[name] = value;
+    if (!noSync){
+      this._stateChangeEmitter?.call(this, [name, value]);
+    }
+    for (const listener of this._stateChangeListeners){
+      listener.call(this, [name, oldValue, value]);
+    }
+  }
+  addStateChangeListener(listener){
+    this._stateChangeListeners.push(listener);
   }
 
   _foundMarker(){
@@ -168,7 +188,7 @@ class ARNEngine {
       console.log(text);
     });
     socket.on('foundSyncedMarker', (markerId, senderId) => {
-      if (markerId in this.syncedMarkerEntities){
+      if (this.syncedAreaAnchorMarker.visible && markerId in this.syncedMarkerEntities){
         this.syncedMarkerEntities[markerId]._foundMarker();
       }
     });
@@ -179,12 +199,21 @@ class ARNEngine {
     });
     socket.on('syncTransform', (objId, position, rotation) => {
       if (objId in this.syncedMarkerEntities){
-        console.log(`syncTransform: ${objId}`);
+        if (this.syncedAreaAnchorMarker.visible && !this.syncedMarkerEntities[objId].visible){
+          this.syncedMarkerEntities[objId]._foundMarker();
+        }else if (!this.syncedAreaAnchorMarker.visible){
+          this.syncedMarkerEntities[objId]._lostMarker();
+        }
         const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
         const aRot = this.syncedAreaAnchorMarker.getRotation();
         const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
         const rot = [aRot[0]+rotation[0], aRot[1]+rotation[1], aRot[2]+rotation[2], rotation[3]];
         this.syncedMarkerEntities[objId]._syncTransform(pos, rot);
+      }
+    });
+    socket.on('syncState', (entityId, name, value) => {
+      if (entityId in this.syncedMarkerEntities){
+        this.syncedMarkerEntities[entityId].commitState(name, value, true);
       }
     });
 
@@ -273,6 +302,11 @@ class ARNEngine {
     markerEl.setAttribute('id', id);
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
+    markerEl.addEventListener('markerLost', () => {
+      for (const marker of Object.values(this.syncedMarkerEntities)){
+        marker._lostMarker();
+      }
+    });
     this.sceneEl.appendChild(markerEl);
 
     const marker = new ARNMarkerEntity(id);
@@ -301,6 +335,9 @@ class ARNEngine {
     syncedEl.setAttribute('id', id);
     this.sceneEl.appendChild(syncedEl);
     const syncedEntity = new ARNSyncedMarkerEntity(id);
+    syncedEntity._stateChangeEmitter = (name, value) => {
+      this.socket.emit('syncState', id, name, value);
+    };
     this.syncedMarkerEntities[id] = syncedEntity;
     return syncedEntity;
   }
