@@ -8,21 +8,19 @@ class Nazo04 {
     // //rotationの初期値は,雑な数字に.
 
     function showEntity(foundNumbers,playerNumber){
+      engine.getEntity(`nazo04-player1-1`).visible = false;
+      engine.getEntity(`nazo04-player1-2`).visible = false;
       if(playerNumber === 1){
         const sum = foundNumbers.reduce((prev, curr) => prev + curr, 0);
         if(sum == 3){
-          //alert(3)
           engine.getEntity('nazo04-player1-1').visible = true;
-          engine.getEntity('nazo04-player1-2').visible = false;
-        
+          engine.getEntity('nazo04-player1-2').visible = false;        
           
         }else if(sum == 2){
-          //alert(2)
           engine.getEntity('nazo04-player1-1').visible = false;
           engine.getEntity('nazo04-player1-2').visible = true;
 
         }else if(sum == 1){
-          //alert(1)
           engine.getEntity('nazo04-player1-1').visible = false;
           engine.getEntity('nazo04-player1-2').visible = false;
         }
@@ -30,7 +28,6 @@ class Nazo04 {
       else if(playerNumber === 2){
         const sum = foundNumbers.reduce((prev, curr) => prev + curr, 0);
         if(sum == 3){
-          //alert(3)
           engine.getEntity('nazo04-player2-1').visible = true;
           engine.getEntity('nazo04-player2-2').visible = false;
         
@@ -50,10 +47,9 @@ class Nazo04 {
 
     let foundNumbers = [];
     let foundNumbers2 = [];
-    //inEntity.setRotation([-90*Math.PI/180,0,0,"XYZ"]);
     let changeRotate;
     let changeRotate2;
-    let entitiyRot = 0;
+    let entitiyRot;
     let beforeMarkerRot = null;
 
     for (const i of [1, 2]){
@@ -67,38 +63,29 @@ class Nazo04 {
       marker.addMarkerFoundEventListener(() => {
         const twoMarker = engine.getMarker('nazo04-player1-marker2');
         const inEntity = engine.getEntity('nazo04-player1-1');
-        if(beforeMarkerRot === null){
-          beforeMarkerRot = twoMarker.getRotation()[2];
-        }
-        changeRotate = setInterval(() => {
-          console.log("before:"+entitiyRot);
-          let nowMarkerRot = twoMarker.getRotation()[2];
-          if (beforeMarkerRot){
-            let diffRot = nowMarkerRot - beforeMarkerRot;
-            console.log("差:"+diffRot*180/Math.PI);
-            //console.log(nowMarkerRot,beforeMarkerRot);
-            //console.log(diffRotY);
-            if (diffRot != 0) {
-              let newEntityRot = entitiyRot+diffRot;
-              inEntity.setRotation([-90*Math.PI/180,0,newEntityRot,"XYZ"]);
-              console.log("get_rotation"+inEntity.getRotation());
-              entitiyRot = newEntityRot;
-              //console.log(inEntity.getRotation());
-            }
-          }
-          beforeMarkerRot = nowMarkerRot;
-        }, 500);
-        for(const j of [1,2]){
-          engine.getEntity(`nazo04-player1-${i}`).visible = false;
-        }
+        const firstRot = twoMarker.getRotation()[2]; //マーカーを見つけた時のマーカの角度
+        console.log("firstRot:"+firstRot*180/Math.PI);
+
         foundNumbers.push(i);
         showEntity(foundNumbers,1);
+        if(inEntity.visible){
+          console.log("inen true");
+          entitiyRot=0;
+          changeRotate = setInterval(() => {
+            entitiyRot += 1;
+            console.log(entitiyRot);
+
+            let nowRot = twoMarker.getRotation()[2];
+            let diff = nowRot-firstRot;
+            inEntity.setRotation([-90*Math.PI/180 ,0 ,diff,"XYZ"]);
+            console.log("nowRot:"+nowRot*180/Math.PI+",diff:"+diff*180/Math.PI);
+
+          }, 200);
+        }
+        
       });
     //markerを見失った時
       marker.addMarkerLostEventListener(() => {
-        for(const j of [1,2]){
-          engine.getEntity(`nazo04-player1-${i}`,).visible = false;
-        }
         foundNumbers = foundNumbers.filter(x => x != i);
         showEntity(foundNumbers,1);
         clearInterval(changeRotate);
@@ -112,42 +99,33 @@ class Nazo04 {
       popEntity.visible = false;
       engine.createEntity('nazo04-player-out', 'nazo04-player2-out-png', 'nazo04-player2-marker1', [0,0.1,-0.5], [-90,0,0], [1.2,1,1.2]);
 
-    
     //markerを見つけた時
       marker2.addMarkerFoundEventListener(() => {
         const twoMarker = engine.getMarker('nazo04-player2-marker2');
         const inEntity = engine.getEntity('nazo04-player2-1');
-        beforeMarkerRot = twoMarker.getRotation()[2];
-        alert(beforeMarkerRot*180/Math.PI);
-        changeRotate2 = setInterval(() => {
-          console.log("before:"+entitiyRot);
-          let nowMarkerRot = twoMarker.getRotation()[2];
-          //console.log("nowMarkerRot="+nowMarkerRot*180/Math.PI);
-          let diffRot = nowMarkerRot - beforeMarkerRot;
-          console.log("差:"+diffRot*180/Math.PI);
-          //console.log(nowMarkerRot,beforeMarkerRot);
-          if (Math.abs(diffRot*180/Math.PI) >= 0) {
-            let newEntityRot = entitiyRot+diffRot;
-            inEntity.setRotation([-90*Math.PI/180,0,newEntityRot,"XYZ"]);
-            //console.log("get_rotation"+inEntity.getRotation());
-            entitiyRot = newEntityRot;//Entityの角度の更新
-            console.log("entitiyRot="+entitiyRot*180/Math.PI);
-            beforeMarkerRot = nowMarkerRot;
-            //console.log("newEntityRot="+newEntityRot);
-          }
-          
-        }, 2000);
-        for(const j of [1,2]){
-          engine.getEntity(`nazo04-player2-${i}`).visible = false;
-        }
+        const firstRot = twoMarker.getRotation()[2]; //マーカーを見つけた時のマーカの角度
+        console.log("firstRot:"+firstRot*180/Math.PI);
+
         foundNumbers2.push(i);
         showEntity(foundNumbers2,2);
+        if(inEntity.visible){
+          console.log("inen true");
+          entitiyRot=0;
+          changeRotate = setInterval(() => {
+            entitiyRot += 1;
+            console.log(entitiyRot);
+
+            let nowRot = twoMarker.getRotation()[2];
+            let diff = nowRot-firstRot;
+            inEntity.setRotation([-90*Math.PI/180 ,0 ,diff,"XYZ"]);
+            console.log("nowRot:"+nowRot*180/Math.PI+",diff:"+diff*180/Math.PI);
+
+          }, 200);
+        }
+        
       });
     //markerを見失った時
       marker2.addMarkerLostEventListener(() => {
-        for(const j of [1,2]){
-          engine.getEntity(`nazo04-player2-${i}`,).visible = false;
-        }
         foundNumbers2 = foundNumbers2.filter(x => x != i);
         showEntity(foundNumbers2,2);
         clearInterval(changeRotate2);
