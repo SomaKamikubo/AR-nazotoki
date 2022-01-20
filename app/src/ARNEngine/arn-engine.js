@@ -312,7 +312,7 @@ class ARNEngine {
       }
     });
     this.sceneEl.appendChild(markerEl);
-
+    this.createEntity('${id}_default','defaultAssets',id,[0,-0.1,0], [-90,0,0], [1,1,1]);
     const marker = new ARNMarkerEntity(id);
     this.syncedAreaAnchorMarker = marker;
     return marker;
