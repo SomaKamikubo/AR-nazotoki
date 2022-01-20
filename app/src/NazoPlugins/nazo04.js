@@ -54,7 +54,6 @@ class Nazo04 {
     let changeRotate;
     let changeRotate2;
     let entitiyRot = 0;
-    console.log("fist:"+entitiyRot*180/Math.PI);
     let beforeMarkerRot = null;
 
     for (const i of [1, 2]){
@@ -119,7 +118,7 @@ class Nazo04 {
         const twoMarker = engine.getMarker('nazo04-player2-marker2');
         const inEntity = engine.getEntity('nazo04-player2-1');
         beforeMarkerRot = twoMarker.getRotation()[2];
-        
+        alert(beforeMarkerRot*180/Math.PI);
         changeRotate2 = setInterval(() => {
           console.log("before:"+entitiyRot);
           let nowMarkerRot = twoMarker.getRotation()[2];
@@ -137,7 +136,7 @@ class Nazo04 {
             //console.log("newEntityRot="+newEntityRot);
           }
           
-        }, 1000);
+        }, 2000);
         for(const j of [1,2]){
           engine.getEntity(`nazo04-player2-${i}`).visible = false;
         }
