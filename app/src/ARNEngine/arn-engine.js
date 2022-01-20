@@ -17,16 +17,15 @@ class ARNEntity {
     const v = this.el.object3D.position;
     return [v.x, v.y, v.z];
   }
-  setPosition(x,y,z){
-    this.el.object3D.position.set(x,y,z);
+  setPosition(newPos){
+    this.el.object3D.position.set(...newPos);
   }
 
   getRotation(){
-    const e = this.el.object3D.rotation;
-    return [e.x, e.y, e.z, e.w];
+    return this.el.object3D.rotation.toArray();
   }
-  setRotation(x,y,z){
-    this.el.object3D.rotation.set(x,y,z);
+  setRotation(newRotation){
+    this.el.object3D.rotation.fromArray(newRotation);
   }
 
   getScale(){
@@ -99,6 +98,26 @@ class ARNSyncedMarkerEntity extends ARNEntity {
     this.internalMarkerEl.addEventListener('markerLost', () => this._lostMarker.call(this));
     this._markerFoundEventListeners = [];
     this._markerLostEventListeners = [];
+    this._state = {};
+    this._stateChangeListeners = [];
+    this._stateChangeEmitter = null;
+  }
+
+  get state(){
+    return this._state;
+  }
+  commitState(name, value, noSync=false){
+    const oldValue = this._state[name] ?? null;
+    this._state[name] = value;
+    if (!noSync){
+      this._stateChangeEmitter?.call(this, name, value);
+    }
+    for (const listener of this._stateChangeListeners){
+      listener.call(this, name, oldValue, value);
+    }
+  }
+  addStateChangeListener(listener){
+    this._stateChangeListeners.push(listener);
   }
 
   _foundMarker(){
@@ -113,9 +132,10 @@ class ARNSyncedMarkerEntity extends ARNEntity {
       listener.call(this);
     }
   }
-  _syncTransform(position, rotation){
+  _syncTransform(position, rotation, scale){
     this.setPosition(position);
     this.setRotation(rotation);
+    this.setScale(scale);
   }
 
   addMarkerFoundEventListener(listener){
@@ -168,7 +188,7 @@ class ARNEngine {
       console.log(text);
     });
     socket.on('foundSyncedMarker', (markerId, senderId) => {
-      if (markerId in this.syncedMarkerEntities){
+      if (this.syncedAreaAnchorMarker.visible && markerId in this.syncedMarkerEntities){
         this.syncedMarkerEntities[markerId]._foundMarker();
       }
     });
@@ -177,9 +197,24 @@ class ARNEngine {
         this.syncedMarkerEntities[markerId]._lostMarker();
       }
     });
-    socket.on('syncTransform', (objId, position, rotation) => {
+    socket.on('syncTransform', (objId, position, rotation, scale) => {
       if (objId in this.syncedMarkerEntities){
-        this.syncedMarkerEntities[objId]._syncTransform(position, rotation);
+        if (this.syncedAreaAnchorMarker.visible && !this.syncedMarkerEntities[objId].visible){
+          this.syncedMarkerEntities[objId]._foundMarker();
+        }else if (!this.syncedAreaAnchorMarker.visible){
+          this.syncedMarkerEntities[objId]._lostMarker();
+        }
+        const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
+        const aRot = this.syncedAreaAnchorMarker.getRotation();
+        const pos = [aPos.x+position[0], aPos.y+position[1], aPos.z+position[2]];
+        const rot = [aRot[0]+rotation[0], aRot[1]+rotation[1], aRot[2]+rotation[2], rotation[3]];
+        this.syncedMarkerEntities[objId]._syncTransform(pos, rot, scale);
+        // console.log(`sync: ${objId}`);
+      }
+    });
+    socket.on('syncState', (entityId, name, value) => {
+      if (entityId in this.syncedMarkerEntities){
+        this.syncedMarkerEntities[entityId].commitState(name, value, true);
       }
     });
 
@@ -188,20 +223,21 @@ class ARNEngine {
   }
 
   _updateSyncedObjects(){
-    if (!this.syncedAreaAnchorMarker || !this.syncedAreaAnchorMarker.visible){
-      return;
-    }
+    const aVisible = this.syncedAreaAnchorMarker && this.syncedAreaAnchorMarker.visible;
     const aPos = this.syncedAreaAnchorMarker.el.object3D.position;
-    const aRot = this.syncedAreaAnchorMarker.el.object3D.rotation;
+    const aRot = this.syncedAreaAnchorMarker.getRotation();
     for (const syncedEntity of Object.values(this.syncedMarkerEntities)){
       const inEl = syncedEntity.internalMarkerEl;
       if (inEl && inEl.object3D.visible){
         const pos = inEl.object3D.position;
         const rot = inEl.object3D.rotation;
-        const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
-        const relRot = [rot.x-aRot.x, rot.y-aRot.y, rot.z-aRot.z, rot.w-aRot.w];
-        syncedEntity._syncTransform(relPos, relRot);
-        this.socket.emit('syncTransform', relPos, relRot);
+        const scale = inEl.object3D.scale;
+        syncedEntity._syncTransform(pos.toArray(), rot.toArray(), scale.toArray());
+        if (aVisible){
+          const relPos = [pos.x-aPos.x, pos.y-aPos.y, pos.z-aPos.z];
+          const relRot = [rot.x-aRot[0], rot.y-aRot[1], rot.z-aRot[2], aRot[3]];
+          this.socket.emit('syncTransform', syncedEntity.id, relPos, relRot, scale.toArray());
+        }
       }
     }
   }
@@ -236,6 +272,7 @@ class ARNEngine {
     newAssetEl.setAttribute('src', url);
     newAssetEl.setAttribute('arne-asset-type', type);
     assetsContainer.appendChild(newAssetEl);
+    return id;
   }
 
   registerMarker(id, pattUrl){
@@ -268,6 +305,11 @@ class ARNEngine {
     markerEl.setAttribute('id', id);
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
+    markerEl.addEventListener('markerLost', () => {
+      for (const marker of Object.values(this.syncedMarkerEntities)){
+        marker._lostMarker();
+      }
+    });
     this.sceneEl.appendChild(markerEl);
 
     const marker = new ARNMarkerEntity(id);
@@ -285,7 +327,9 @@ class ARNEngine {
     markerEl.setAttribute('type', 'pattern');
     markerEl.setAttribute('url', pattUrl);
     markerEl.addEventListener('markerFound', () => {
-      this.socket.emit('foundSyncedMarker', id);
+      if (this.syncedAreaAnchorMarker && this.syncedAreaAnchorMarker.visible){
+        this.socket.emit('foundSyncedMarker', id);
+      }
     });
     markerEl.addEventListener('markerLost', () => {
       this.socket.emit('lostSyncedMarker', id);
@@ -294,8 +338,11 @@ class ARNEngine {
 
     const syncedEl = document.createElement('a-entity');
     syncedEl.setAttribute('id', id);
-    this.syncedAreaAnchorMarker.el.appendChild(syncedEl);
+    this.sceneEl.appendChild(syncedEl);
     const syncedEntity = new ARNSyncedMarkerEntity(id);
+    syncedEntity._stateChangeEmitter = (name, value) => {
+      this.socket.emit('syncState', id, name, value);
+    };
     this.syncedMarkerEntities[id] = syncedEntity;
 
     return syncedEntity;
@@ -330,6 +377,22 @@ class ARNEngine {
     }
     newEntityEl.setAttribute('id', id);
     newEntityEl.setAttribute('src', `#${assetId}`);
+    newEntityEl.setAttribute('position', `${Utils.vec3ToStr(position)}`);
+    newEntityEl.setAttribute('rotation', `${Utils.vec3ToStr(rotation)}`);
+    newEntityEl.setAttribute('scale', `${Utils.vec3ToStr(scale)}`);
+    if (parentEntityId){
+      const parentEl = document.getElementById(parentEntityId);
+      parentEl.appendChild(newEntityEl);
+    }else{
+      this.sceneEl.appendChild(newEntityEl);
+    }
+    return new ARNEntity(id);
+  }
+
+  createEntityFromPrimShape(id, shapeName, parentEntityId=null, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]){
+    const newEntityEl = document.createElement('a-entity');
+    newEntityEl.setAttribute('geometry', `primitive: ${shapeName}`);
+    newEntityEl.setAttribute('id', id);
     newEntityEl.setAttribute('position', `${Utils.vec3ToStr(position)}`);
     newEntityEl.setAttribute('rotation', `${Utils.vec3ToStr(rotation)}`);
     newEntityEl.setAttribute('scale', `${Utils.vec3ToStr(scale)}`);

@@ -38,9 +38,9 @@ io.on('connection', (socket) => {
     console.log(`changedReadyState: ${readyCount}, ${sockets.length}`);
   });
 
-  socket.on('syncTransform', async (objId, position, rotation) => {
-    socket.to(socket.data.roomId).emit('syncTransform', objId, position, rotation);
-    console.log(`syncTransform: ${objId}, ${position}, ${rotation}`);
+  socket.on('syncTransform', async (objId, position, rotation, scale) => {
+    socket.to(socket.data.roomId).emit('syncTransform', objId, position, rotation, scale);
+    console.log(`syncTransform: ${objId}, ${position}, ${rotation}, ${scale}`);
   });
   socket.on('foundSyncedMarker', async (markerId) => {
     socket.to(socket.data.roomId).emit('foundSyncedMarker', markerId, socket.id);
@@ -49,6 +49,10 @@ io.on('connection', (socket) => {
   socket.on('lostSyncedMarker', async (markerId) => {
     socket.to(socket.data.roomId).emit('lostSyncedMarker', markerId, socket.id);
     console.log(`lostMarker: ${markerId}, ${socket.id}`);
+  });
+  socket.on('syncState', async (entityId, name, value) => {
+    socket.to(socket.data.roomId).emit('syncState', entityId, name, value);
+    console.log(`syncState: ${entityId}, ${name}, (${value})`);
   });
 
   socket.on('disconnect', (reason) => {
